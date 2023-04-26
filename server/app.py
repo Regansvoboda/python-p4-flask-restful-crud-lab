@@ -44,6 +44,26 @@ class PlantByID(Resource):
     def get(self, id):
         plant = Plant.query.filter_by(id=id).first().to_dict()
         return make_response(jsonify(plant), 200)
+    
+    def patch(self, id):
+        p = Plant.query.filter_by(id = id).first()
+        if p == None:
+            return make_response({'error': 'plant not found'}, 404)
+        data = request.get_json()
+        for key in data.keys():
+            setattr(p, key, data[key])
+        db.session.add(p)
+        db.session.commit()
+        return make_response(p.to_dict(), 200)
+    
+    def delete(self, id):
+        p = Plant.query.filter_by(id = id).first()
+        if p == None:
+            return make_response({'error': 'plant not found'}, 404)
+        db.session.delete(p)
+        db.session.commit()
+        return make_response({'msg': 'deleted successfully'}, 200)
+
 
 api.add_resource(PlantByID, '/plants/<int:id>')
         
